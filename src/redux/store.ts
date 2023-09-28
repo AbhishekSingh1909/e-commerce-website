@@ -12,6 +12,7 @@ import { persistReducer, persistStore } from "redux-persist";
 const preConfig = {
   key: "root",
   storage,
+  blacklist: ["productReducer", "ProductCategoryReducer"],
 };
 
 const rootReducer = combineReducers({

@@ -4,6 +4,7 @@ import axios, { AxiosResponse } from "axios";
 import IProduct from "../../types/Product";
 import IPaginationQuery from "../../types/Queries/PaginationQuery";
 import IUpdateProduct from "../../types/UpdateProduct";
+import { getProductsByCategory } from "./getProductsByCaregory";
 
 const initialState: {
   products: IProduct[];
@@ -62,7 +63,7 @@ const productsSlice = createSlice({
         return {
           ...state,
           loading: false,
-          products: [...action.payload],
+          products: action.payload,
         };
       }
     });
@@ -87,7 +88,7 @@ const productsSlice = createSlice({
         const foundIndex = state.products.findIndex(
           (p) => p.id === action.payload.id
         );
-        if (foundIndex != -1) {
+        if (foundIndex !== -1) {
           state.products[foundIndex] = action.payload;
         }
 
@@ -110,6 +111,30 @@ const productsSlice = createSlice({
             loading: false,
           };
         }
+      });
+    builder
+      .addCase(getProductsByCategory.fulfilled, (state, action) => {
+        if (!(action.payload instanceof Error)) {
+          return {
+            ...state,
+            loading: false,
+            products: action.payload,
+          };
+        }
+      })
+      .addCase(getProductsByCategory.pending, (state, action) => {
+        return {
+          ...state,
+          loading: true,
+        };
+      })
+      .addCase(getProductsByCategory.rejected, (state, action) => {
+        if (action.payload instanceof Error)
+          return {
+            ...state,
+            error: action.payload.message,
+            loading: false,
+          };
       });
   },
 });
