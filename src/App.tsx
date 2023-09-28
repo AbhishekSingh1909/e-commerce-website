@@ -1,9 +1,14 @@
-import React from 'react'
+import React from "react";
+import ProductsPage from "./pages/PorductsPage";
+import ProductCategory from "./pages/ProductCategoriesPage";
 
 const App = () => {
   return (
-    <div>App</div>
-  )
-}
+    <div>
+      <ProductCategory />
+      <ProductsPage />
+    </div>
+  );
+};
 
-export default App
+export default App;
