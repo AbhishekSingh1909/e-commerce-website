@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import ICategory from "../../types/Category";
-import { getProductCategories } from "./getProductCaregores";
+import { getProductCategories } from "./getCaregories";
 
 const initialState: {
   categories: ICategory[];

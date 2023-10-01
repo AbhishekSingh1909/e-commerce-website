@@ -2,18 +2,21 @@ import {
   Box,
   CircularProgress,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
+  Stack,
   Typography,
 } from "@mui/material";
-import { getProductCategories } from "../redux/productCategories/getProductCaregores";
+import { getProductCategories } from "../redux/productCategories/getCaregories";
 import { useEffect, useState } from "react";
 
 import { useAppDispatch } from "../app/hooks/useAppDispatch";
 import { useAppSelector } from "../app/hooks/useAppSelector";
 import ProductsPage from "./PorductsPage";
+import { CreateProductModel } from "../components/Model/CreateProductModel";
 
 const ProductCategory = () => {
   const dispatch = useAppDispatch();
@@ -43,12 +46,12 @@ const ProductCategory = () => {
   return (
     <main>
       <Box
-        sx={{
-          display: "flex",
-          alignItems: "end",
-          flexDirection: "row",
-          flexFlow: "wrap row",
-        }}
+      // sx={{
+      //   display: "flex",
+      //   alignItems: "end",
+      //   flexDirection: "row",
+      //   flexFlow: "wrap row",
+      // }}
       >
         {/* {error && <Typography> {`There is a error : ${error}`}</Typography>}
       {loading && (
@@ -60,15 +63,20 @@ const ProductCategory = () => {
           <Box
             sx={{
               display: "flex",
-              alignItems: "end",
-              flexDirection: "row",
-              flexFlow: "wrap row",
-              justifyContent: "space-between",
-              width: "20%",
-
+              width: "50%",
+              /* padding: 20px; */
+              gap: "10px",
+              marginLeft: "auto",
               marginTop: "2em",
             }}
           >
+            {/* <FormControl fullWidth>
+              
+            </FormControl> */}
+            <Box sx={{ width: "60%" }}>
+              <CreateProductModel />
+            </Box>
+
             <FormControl fullWidth>
               <InputLabel id="demo-select-price-sorting-standard-label">
                 By Price
@@ -95,11 +103,11 @@ const ProductCategory = () => {
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={categoryId?.toString()}
+                value={categoryId === 0 ? "" : categoryId.toString()}
                 label="Categories"
                 onChange={filterHandleChange}
               >
-                <MenuItem value={0}>
+                <MenuItem value="">
                   <em>None</em>
                 </MenuItem>
                 {categories?.map((c) => (

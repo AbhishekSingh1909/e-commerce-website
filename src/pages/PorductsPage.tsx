@@ -5,6 +5,7 @@ import {
   CardContent,
   CircularProgress,
   Container,
+  Pagination,
   Stack,
   Typography,
 } from "@mui/material";
@@ -13,13 +14,14 @@ import { useAppSelector } from "../app/hooks/useAppSelector";
 import { useEffect, useMemo, useState } from "react";
 import IProduct from "../types/Product";
 import { useAppDispatch } from "../app/hooks/useAppDispatch";
-import { getAllProducts } from "../redux/products/productsSlice";
-import { getProductCategories } from "../redux/productCategories/getProductCaregores";
-import {
-  ProductsByCategory,
-  getProductsByCategory,
-} from "../redux/products/getProductsByCaregory";
+import { getAllProducts, sortByPrice } from "../redux/products/productsSlice";
+import { getProductCategories } from "../redux/productCategories/getCaregories";
+import { getProductsByCategory } from "../redux/products/getProductsByCaregory";
 import IPaginationQuery from "../types/Queries/PaginationQuery";
+import BasicModal from "../components/Model/UpdateProductModel";
+import FormDialog from "../components/Model/UpdateProductModel";
+import UpdateProductModel from "../components/Model/UpdateProductModel";
+import { DeleteProductModel } from "../components/Model/DeleteProductModel";
 
 interface ProductProps {
   categoryId: number | undefined;
@@ -40,43 +42,37 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
   );
   // console.log("categoryId", categoryId);
   useEffect(() => {
-    if (categoryId && categoryId > 0) {
-      console.log("products filter", products.length);
-      const pagination: IPaginationQuery = { limit: 5, offset: offset };
-      const productsByCategory: ProductsByCategory = {
-        id: categoryId,
-        pagination,
-      };
-      dispatch(getProductsByCategory(productsByCategory));
+    if (categoryId) {
+      console.log("categoryId", categoryId);
+      dispatch(getProductsByCategory(categoryId));
     } else {
-      console.log("products normal", products.length);
       dispatch(getAllProducts({ limit: 5, offset: offset }));
     }
-  }, [page, categoryId]);
+  }, [categoryId]);
 
-  const loadedProducts = useMemo(() => {
-    if (categoryId && categoryId > 0 && page === 1) {
-      console.log("if Page Category", page, categoryId);
-      console.log("if before data", data.length);
-      console.log("if before products", products.length);
-      setData([]);
-      //setData(products);
-      console.log(" if After", data.length);
-    } else {
-      setData((prev) => [...prev, ...products]);
-      console.log("else before data", data.length);
-    }
+  useEffect(() => {
+    dispatch(sortByPrice(sortPrice === "asc" ? "asc" : "desc"));
+  }, [sortPrice]);
+
+  const pageCount = useMemo(() => {
     setHasMore(products.length > 0);
+    const pageCount = Math.ceil(products.length / 10);
 
-    return data;
+    const data = products?.slice(0, 10);
+    setData(data);
+    return pageCount;
   }, [products]);
 
-  const loadMoreOnClick = () => {
-    // prevent click if the state is loading
-    if (loading) return;
-    setPage((prev) => prev + 1);
-    console.log("page", page);
-    setOffset(page * 5);
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+
+    // show the count at per page
+    // 0 - 10
+    // 11 - 20
+    const startIndex = (value - 1) * 10;
+
+    const data = products?.slice(startIndex, value * 10);
+    setData(data);
   };
 
   return (
@@ -84,12 +80,12 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
       <Container>
         <Typography variant="h3">Products</Typography>;
         {error && <Typography> {`There is a error : ${error}`}</Typography>}
-        {hasMore || (
+        {loading && (
           <Box>
             <CircularProgress />
           </Box>
         )}
-        {loadedProducts && (
+        {data && (
           <Box
             sx={{
               display: "flex",
@@ -99,7 +95,7 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
               borderRadius: "20px",
             }}
           >
-            {loadedProducts?.map((p) => (
+            {data?.map((p) => (
               <Box
                 key={p.id + "" + p.title}
                 sx={{
@@ -110,7 +106,11 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
                 }}
               >
                 <CardContent
-                  sx={{ backgroundColor: "grey", color: "rgb(255, 236, 179)" }}
+                  sx={{
+                    backgroundColor: "grey",
+                    color: "rgb(255, 236, 179)",
+                    borderRadius: "5px",
+                  }}
                 >
                   <Typography
                   // sx={{
@@ -137,19 +137,42 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
                   >
                     {p.price} €
                   </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Stack spacing={1}>
+                      <UpdateProductModel product={p} />
+                    </Stack>
+                    <Stack spacing={1}>
+                      <DeleteProductModel product={p} />
+                    </Stack>
+                  </Box>
                 </CardContent>
-                <Stack spacing={2}>
-                  <Button variant="contained">Update Product</Button>
-                </Stack>
               </Box>
             ))}
           </Box>
         )}
-        {hasMore && (
-          <Stack spacing={2}>
-            <Button color="secondary" onClick={loadMoreOnClick}>
-              {loading ? "Loading..." : "Load More"}
-            </Button>
+        {!loading && !error && (
+          <Stack
+            spacing={2}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Typography>Page: {page}</Typography>
+            <Pagination
+              count={pageCount}
+              page={page}
+              onChange={handleChange}
+              color="primary"
+            />
           </Stack>
         )}
       </Container>

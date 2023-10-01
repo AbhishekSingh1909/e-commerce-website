@@ -1,14 +1,13 @@
-interface IUpdateProduct {
+interface UpdateProduct {
   id: number;
-  updateProduct: IUpdateProduct;
+  updateProduct: ProductDto;
 }
 
-export interface IUpdateProductDto {
+export interface ProductDto {
   title: string;
   price: number;
   description: string;
   categoryId: number;
-  images: string;
 }
 
-export default IUpdateProduct;
+export default UpdateProduct;

@@ -1,10 +1,10 @@
-interface ICategory {
+interface Category {
   id: number;
   name: string;
   image: string;
 }
 
-export default ICategory;
+export default Category;
 
 // id	number	The id of the category.
 // name	string	Name of the category.

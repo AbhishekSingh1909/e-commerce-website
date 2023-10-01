@@ -1,12 +1,12 @@
-import ICategory from "./Category";
+import Category from "./Category";
 
-interface IProduct {
+interface Product {
   id: number;
   title: string;
   price: number;
   description: string;
-  category: ICategory;
+  category: Category;
   images: string[];
 }
 
-export default IProduct;
+export default Product;

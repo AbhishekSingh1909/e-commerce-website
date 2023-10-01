@@ -1,13 +1,15 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios, { AxiosResponse } from "axios";
 
-import IProduct from "../../types/Product";
 import IPaginationQuery from "../../types/Queries/PaginationQuery";
-import IUpdateProduct from "../../types/UpdateProduct";
 import { getProductsByCategory } from "./getProductsByCaregory";
+import UpdateProduct from "../../types/UpdateProduct";
+import Product from "../../types/Product";
+import { createProduct } from "./createProduct";
+import { deleteProduct } from "./deleteProduct";
 
 const initialState: {
-  products: IProduct[];
+  products: Product[];
   error?: string;
   loading: boolean;
 } = {
@@ -16,11 +18,11 @@ const initialState: {
 };
 
 export const getAllProducts = createAsyncThunk(
-  "getAllProducts",
+  "products/getAllProducts",
   async ({ limit, offset }: IPaginationQuery) => {
     try {
-      const response = await axios.get<any, AxiosResponse<IProduct[]>>(
-        `https://api.escuelajs.co/api/v1/products?offset=${offset}&limit=${limit}`
+      const response = await axios.get<any, AxiosResponse<Product[]>>(
+        `https://api.escuelajs.co/api/v1/products`
       );
       return response.data;
     } catch (e) {
@@ -31,16 +33,20 @@ export const getAllProducts = createAsyncThunk(
 );
 
 export const updateProduct = createAsyncThunk(
-  "updateProduct",
-  async (parameter: IUpdateProduct): Promise<IProduct> => {
+  "products/updateProduct",
+  async (params: UpdateProduct) => {
     try {
-      const product = await axios.put(
-        `https://api.escuelajs.co/api/v1/products/${parameter.id}`
+      const response = await axios.put(
+        `https://api.escuelajs.co/api/v1/products/${params.id}`,
+        params.updateProduct
       );
-      return product.data;
+      if (!response.data) {
+        throw new Error("Could not update product");
+      }
+      return response.data;
     } catch (e) {
       const error = e as Error;
-      throw error;
+      return error.message;
     }
   }
 );
@@ -84,24 +90,35 @@ const productsSlice = createSlice({
         };
     });
     builder
+      .addCase(createProduct.fulfilled, (state, action) => {
+        if (!(action.payload instanceof Error)) {
+          const foundIndex = state.products.findIndex(
+            (p) => p.id === action.payload.id
+          );
+
+          if (foundIndex === -1) {
+            state.products.push(action.payload);
+          }
+        }
+      })
+      .addCase(createProduct.rejected, (state, action) => {
+        if (action.payload instanceof Error) {
+          return {
+            ...state,
+            error: action.payload.message,
+            loading: false,
+          };
+        }
+      });
+    builder
       .addCase(updateProduct.fulfilled, (state, action) => {
         const foundIndex = state.products.findIndex(
           (p) => p.id === action.payload.id
         );
+
         if (foundIndex !== -1) {
           state.products[foundIndex] = action.payload;
         }
-
-        return {
-          ...state,
-          loading: false,
-        };
-      })
-      .addCase(updateProduct.pending, (state, action) => {
-        return {
-          ...state,
-          loading: true,
-        };
       })
       .addCase(updateProduct.rejected, (state, action) => {
         if (action.payload instanceof Error) {
@@ -112,6 +129,24 @@ const productsSlice = createSlice({
           };
         }
       });
+    builder
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        if (typeof action.payload === "number") {
+          state.products = state.products.filter(
+            (p) => p.id !== action.payload
+          );
+        }
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        if (action.payload instanceof Error) {
+          return {
+            ...state,
+            error: action.payload.message,
+            loading: false,
+          };
+        }
+      });
+
     builder
       .addCase(getProductsByCategory.fulfilled, (state, action) => {
         if (!(action.payload instanceof Error)) {
