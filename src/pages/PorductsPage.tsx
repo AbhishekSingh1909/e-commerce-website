@@ -14,7 +14,7 @@ import { useAppSelector } from "../app/hooks/useAppSelector";
 import { useEffect, useMemo, useState } from "react";
 import IProduct from "../types/Product";
 import { useAppDispatch } from "../app/hooks/useAppDispatch";
-import { getAllProducts, sortByPrice } from "../redux/products/productsSlice";
+import { getAllProducts, sortByPrice } from "../redux/products/productReducer";
 import { getProductCategories } from "../redux/productCategories/getCaregories";
 import { getProductsByCategory } from "../redux/products/getProductsByCaregory";
 import IPaginationQuery from "../types/Queries/PaginationQuery";
@@ -46,7 +46,7 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
       console.log("categoryId", categoryId);
       dispatch(getProductsByCategory(categoryId));
     } else {
-      dispatch(getAllProducts({ limit: 5, offset: offset }));
+      dispatch(getAllProducts());
     }
   }, [categoryId]);
 

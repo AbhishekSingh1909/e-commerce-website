@@ -1,6 +1,6 @@
 interface UpdateProduct {
   id: number;
-  updateProduct: ProductDto;
+  updateProduct: Partial<ProductDto>;
 }
 
 export interface ProductDto {

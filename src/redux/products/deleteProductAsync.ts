@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
-export const deleteProduct = createAsyncThunk(
+export const deleteProductAsync = createAsyncThunk(
   "products/deleteProduct",
   async (productId: number) => {
     try {
@@ -9,12 +9,11 @@ export const deleteProduct = createAsyncThunk(
         `https://api.escuelajs.co/api/v1/products/${productId}`
       );
       if (!response.data) {
-        throw new Error("Could not delete product");
+        throw new AxiosError("Could not delete product");
       }
-      console.log("delete product", productId);
       return productId;
     } catch (e) {
-      const error = e as Error;
+      const error = e as AxiosError;
       return error.message;
     }
   }

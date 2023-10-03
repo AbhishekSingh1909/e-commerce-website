@@ -20,7 +20,7 @@ import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOu
 
 import { useAppDispatch } from "../../app/hooks/useAppDispatch";
 import { useAppSelector } from "../../app/hooks/useAppSelector";
-import { createProduct } from "../../redux/products/createProduct";
+import { createProductAsync } from "../../redux/products/createProductAsync";
 import { CreateProduct } from "../../types/CreateProduct";
 
 export const CreateProductModel = () => {
@@ -67,7 +67,7 @@ export const CreateProductModel = () => {
 
   useEffect(() => {
     if (product) {
-      dispatch(createProduct(product));
+      dispatch(createProductAsync(product));
       setOpen(false);
     }
   }, [product]);

@@ -31,7 +31,7 @@ import IProduct from "../../types/Product";
 import { useAppSelector } from "../../app/hooks/useAppSelector";
 import { useAppDispatch } from "../../app/hooks/useAppDispatch";
 
-import { updateProduct } from "../../redux/products/productsSlice";
+import { updateProductAsync } from "../../redux/products/productReducer";
 import UpdateProduct, { ProductDto } from "../../types/UpdateProduct";
 import Product from "../../types/Product";
 
@@ -44,6 +44,7 @@ export default function UpdateProductModel({ product }: { product: Product }) {
   const [categoryId, setCategoryId] = React.useState(product.category.id);
   const [updatedProduct, setUpdatedProduct] = useState<UpdateProduct>();
   const [showMessage, setShowMessage] = useState(false);
+  // const [singleProduct, setSingleProduct] = React.useState<Product>(product);
 
   const dispatch = useAppDispatch();
   const categories = useAppSelector(
@@ -82,6 +83,7 @@ export default function UpdateProductModel({ product }: { product: Product }) {
     };
     setUpdatedProduct(updateProduct);
     setShowMessage(true);
+    setOpenAlert(true);
     // if (!showMessage) {
     //   console.log("showMessage", showMessage);
 
@@ -90,7 +92,7 @@ export default function UpdateProductModel({ product }: { product: Product }) {
 
   React.useEffect(() => {
     if (updatedProduct) {
-      dispatch(updateProduct(updatedProduct));
+      dispatch(updateProductAsync(updatedProduct));
     }
     setOpen(false);
   }, [updatedProduct]);
@@ -103,6 +105,7 @@ export default function UpdateProductModel({ product }: { product: Product }) {
   //   }
   //   return false;
   // }, [updatedProduct]);
+  console.log("show Message", showMessage);
 
   return (
     <main>

@@ -30,8 +30,20 @@ const cartSlice = createSlice({
         (item) => item.id === action.payload
       );
       if (foundIndex !== -1) {
-        state.cartItems.splice(foundIndex, 1);
+        if (state.cartItems[foundIndex].quantity > 1) {
+          state.cartItems[foundIndex].quantity -= 1;
+        } else {
+          state.cartItems.splice(foundIndex, 1);
+        }
       }
+    },
+    clearCart: (state) => {
+      state.cartItems = [];
     },
   },
 });
+
+const cartReducer = cartSlice.reducer;
+export const { addToCart, detetFromCart, clearCart } = cartSlice.actions;
+
+export default cartReducer;

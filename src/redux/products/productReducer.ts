@@ -1,12 +1,11 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios, { AxiosResponse } from "axios";
 
-import IPaginationQuery from "../../types/Queries/PaginationQuery";
 import { getProductsByCategory } from "./getProductsByCaregory";
 import UpdateProduct from "../../types/UpdateProduct";
 import Product from "../../types/Product";
-import { createProduct } from "./createProduct";
-import { deleteProduct } from "./deleteProduct";
+import { createProductAsync } from "./createProductAsync";
+import { deleteProductAsync } from "./deleteProductAsync";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 const initialState: {
   products: Product[];
@@ -19,24 +18,24 @@ const initialState: {
 
 export const getAllProducts = createAsyncThunk(
   "products/getAllProducts",
-  async ({ limit, offset }: IPaginationQuery) => {
+  async () => {
     try {
       const response = await axios.get<any, AxiosResponse<Product[]>>(
         `https://api.escuelajs.co/api/v1/products`
       );
       return response.data;
     } catch (e) {
-      const error = e as Error;
+      const error = e as AxiosError;
       return error;
     }
   }
 );
 
-export const updateProduct = createAsyncThunk(
+export const updateProductAsync = createAsyncThunk(
   "products/updateProduct",
-  async (params: UpdateProduct) => {
+  async (params: UpdateProduct, { rejectWithValue }) => {
     try {
-      const response = await axios.put(
+      const response = await axios.put<Product>(
         `https://api.escuelajs.co/api/v1/products/${params.id}`,
         params.updateProduct
       );
@@ -45,8 +44,8 @@ export const updateProduct = createAsyncThunk(
       }
       return response.data;
     } catch (e) {
-      const error = e as Error;
-      return error.message;
+      const error = e as AxiosError;
+      return rejectWithValue(error);
     }
   }
 );
@@ -90,19 +89,19 @@ const productsSlice = createSlice({
         };
     });
     builder
-      .addCase(createProduct.fulfilled, (state, action) => {
-        if (!(action.payload instanceof Error)) {
-          const foundIndex = state.products.findIndex(
-            (p) => p.id === action.payload.id
-          );
+      .addCase(createProductAsync.fulfilled, (state, action) => {
+        // if (!(action.payload instanceof Error)) {
+        const foundIndex = state.products.findIndex(
+          (p) => p.id === action.payload.id
+        );
 
-          if (foundIndex === -1) {
-            state.products.push(action.payload);
-          }
+        if (foundIndex === -1) {
+          state.products.push(action.payload);
         }
+        // }
       })
-      .addCase(createProduct.rejected, (state, action) => {
-        if (action.payload instanceof Error) {
+      .addCase(createProductAsync.rejected, (state, action) => {
+        if (action.payload instanceof AxiosError) {
           return {
             ...state,
             error: action.payload.message,
@@ -111,7 +110,7 @@ const productsSlice = createSlice({
         }
       });
     builder
-      .addCase(updateProduct.fulfilled, (state, action) => {
+      .addCase(updateProductAsync.fulfilled, (state, action) => {
         const foundIndex = state.products.findIndex(
           (p) => p.id === action.payload.id
         );
@@ -120,8 +119,8 @@ const productsSlice = createSlice({
           state.products[foundIndex] = action.payload;
         }
       })
-      .addCase(updateProduct.rejected, (state, action) => {
-        if (action.payload instanceof Error) {
+      .addCase(updateProductAsync.rejected, (state, action) => {
+        if (action.payload instanceof AxiosError) {
           return {
             ...state,
             error: action.payload.message,
@@ -130,14 +129,14 @@ const productsSlice = createSlice({
         }
       });
     builder
-      .addCase(deleteProduct.fulfilled, (state, action) => {
+      .addCase(deleteProductAsync.fulfilled, (state, action) => {
         if (typeof action.payload === "number") {
           state.products = state.products.filter(
             (p) => p.id !== action.payload
           );
         }
       })
-      .addCase(deleteProduct.rejected, (state, action) => {
+      .addCase(deleteProductAsync.rejected, (state, action) => {
         if (action.payload instanceof Error) {
           return {
             ...state,

@@ -21,7 +21,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useAppDispatch } from "../../app/hooks/useAppDispatch";
 import { useAppSelector } from "../../app/hooks/useAppSelector";
 import Product from "../../types/Product";
-import { deleteProduct } from "../../redux/products/deleteProduct";
+import { deleteProductAsync } from "../../redux/products/deleteProductAsync";
 
 export const DeleteProductModel = ({ product }: { product: Product }) => {
   const [open, setOpen] = React.useState(false);
@@ -46,7 +46,7 @@ export const DeleteProductModel = ({ product }: { product: Product }) => {
 
   const deletedProduct = () => {
     if (product) {
-      dispatch(deleteProduct(product.id));
+      dispatch(deleteProductAsync(product.id));
     }
   };
 
