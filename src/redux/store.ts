@@ -13,6 +13,9 @@ import {
 
 import productReducer from "./products/productReducer";
 import ProductCategoryReducer from "./productCategories/categoryReducer";
+import cartReducer from "./cart/cartReducer";
+import authReducer from "./userAuthentication/authReducer";
+import userReducer from "./users/userReducer";
 
 // const store = configureStore({
 //   reducer: { productReducer },
@@ -28,6 +31,9 @@ const preConfig = {
 const rootReducer = combineReducers({
   productReducer,
   ProductCategoryReducer,
+  cartReducer,
+  authReducer,
+  userReducer,
 });
 
 const persistedReducer: Reducer<AppState, any> = persistReducer(
