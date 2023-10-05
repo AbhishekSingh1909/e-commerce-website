@@ -7,7 +7,6 @@ export const authenticateUserAsync = createAsyncThunk<
   string,
   { rejectValue: AxiosError }
 >("authenticateUserAsync", async (access_token, { rejectWithValue }) => {
-  console.log("Bearer ${token}", access_token);
   const config = {
     headers: {
       Authorization: `Bearer ${access_token}`,

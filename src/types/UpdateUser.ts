@@ -5,7 +5,6 @@ export interface UpdateUser {
 
 export interface UpdateUserDto {
   name: string;
-  role: "customer" | "admin";
   email: string;
   password: string;
   avatar: string;

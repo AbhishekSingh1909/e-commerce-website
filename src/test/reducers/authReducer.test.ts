@@ -3,7 +3,7 @@ import { userAccess_token } from "../../redux/userAuthentication/authReducer";
 import { authenticateUserAsync } from "../../redux/userAuthentication/authenticateUserAsync";
 import { userLogInAsync } from "../../redux/userAuthentication/userLogInAsync";
 import { userToken, usersData } from "../dataSeed/usersData.Seed";
-import userServer from "../shared/userServer";
+import authServer from "../shared/authServer";
 
 let store = createStore();
 
@@ -12,31 +12,41 @@ beforeEach(() => {
 });
 
 // Enable API mocking before tests.
-beforeAll(() => userServer.listen());
+beforeAll(() => authServer.listen());
 
 // Reset any runtime request handlers we may add during the tests.
-afterEach(() => userServer.resetHandlers());
+afterEach(() => authServer.resetHandlers());
 
 // Disable API mocking after the tests are done.
-afterAll(() => userServer.close());
+afterAll(() => authServer.close());
 
-fdescribe("Test auth reducer async actions", () => {
-  test.only("Should user login with right credential", async () => {
+describe("Test auth reducer async actions", () => {
+  test("Should user login with right credential", async () => {
     await store.dispatch(
       userLogInAsync({ email: "john@mail.com", password: "changeme" })
     );
     expect(store.getState().authReducer.user).toMatchObject(usersData[0]);
   });
-  test.only("Should not login user with wrong credential", async () => {
+  test("Should not login user with wrong credential", async () => {
     await store.dispatch(
       userLogInAsync({ email: "john@mail.com", password: "cngeme" })
     );
-    expect(store.getState().authReducer.user).not.toMatchObject(usersData[0]);
+    expect(store.getState().authReducer.error).toBe(
+      "user's cedential is not valid"
+    );
   });
-  test.only("Should authenticate user with right token", async () => {
+  test("Should authenticate user with right token", async () => {
     await store.dispatch(
       authenticateUserAsync(userToken.access_token + "_" + 2)
     );
     expect(store.getState().authReducer.user).toMatchObject(usersData[1]);
+  });
+  test("Should not authenticate user with worng token", async () => {
+    await store.dispatch(
+      authenticateUserAsync(userToken.refresh_token + "_" + 10)
+    );
+    expect(store.getState().authReducer.error).toBe(
+      "The user is not authorized"
+    );
   });
 });

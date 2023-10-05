@@ -5,16 +5,18 @@ import axios, { AxiosError } from "axios";
 import { User } from "../../types/User";
 
 export const updateUserAsync = createAsyncThunk(
-  "users/updateUser",
+  "users/updateUserAsync",
   async (user: UpdateUser, { rejectWithValue }) => {
     try {
       const response = await axios.put<User>(
         `https://api.escuelajs.co/api/v1/users/${user.id}`,
         user.updateUser
       );
+      console.log("response.data for update", response.data);
       return response.data;
     } catch (e) {
       const error = e as AxiosError;
+      console.log("error for update", error.message);
       return rejectWithValue(error);
     }
   }
