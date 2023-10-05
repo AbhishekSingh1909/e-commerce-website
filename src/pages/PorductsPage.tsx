@@ -14,9 +14,12 @@ import { useAppSelector } from "../app/hooks/useAppSelector";
 import { useEffect, useMemo, useState } from "react";
 import IProduct from "../types/Product";
 import { useAppDispatch } from "../app/hooks/useAppDispatch";
-import { getAllProducts, sortByPrice } from "../redux/products/productReducer";
-import { getProductCategories } from "../redux/productCategories/getCaregories";
-import { getProductsByCategory } from "../redux/products/getProductsByCaregory";
+import {
+  getAllProductsAsync,
+  sortByPrice,
+} from "../redux/products/productReducer";
+import { getProductCategoriesAsync } from "../redux/productCategories/getProductCategoriesAsync";
+import { getProductsByCategoryAsync } from "../redux/products/getProductsByCategoryAsync";
 import IPaginationQuery from "../types/Queries/PaginationQuery";
 import BasicModal from "../components/Model/UpdateProductModel";
 import FormDialog from "../components/Model/UpdateProductModel";
@@ -44,9 +47,9 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
   useEffect(() => {
     if (categoryId) {
       console.log("categoryId", categoryId);
-      dispatch(getProductsByCategory(categoryId));
+      dispatch(getProductsByCategoryAsync(categoryId));
     } else {
-      dispatch(getAllProducts());
+      dispatch(getAllProductsAsync());
     }
   }, [categoryId]);
 
@@ -80,7 +83,7 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
       <Container>
         <Typography variant="h3">Products</Typography>;
         {error && <Typography> {`There is a error : ${error}`}</Typography>}
-        {loading && (
+        {hasMore || (
           <Box>
             <CircularProgress />
           </Box>
@@ -157,7 +160,7 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
             ))}
           </Box>
         )}
-        {!loading && !error && (
+        {data && (
           <Stack
             spacing={2}
             sx={{

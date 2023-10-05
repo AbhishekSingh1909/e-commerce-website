@@ -105,8 +105,6 @@ export default function UpdateProductModel({ product }: { product: Product }) {
   //   }
   //   return false;
   // }, [updatedProduct]);
-  console.log("show Message", showMessage);
-
   return (
     <main>
       <Box>

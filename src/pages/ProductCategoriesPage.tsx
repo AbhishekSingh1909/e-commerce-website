@@ -10,7 +10,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { getProductCategories } from "../redux/productCategories/getCaregories";
+import { getProductCategoriesAsync } from "../redux/productCategories/getProductCategoriesAsync";
 import { useEffect, useState } from "react";
 
 import { useAppDispatch } from "../app/hooks/useAppDispatch";
@@ -25,7 +25,7 @@ const ProductCategory = () => {
   const [priceSort, setPricePriceSort] = useState("");
 
   useEffect(() => {
-    dispatch(getProductCategories());
+    dispatch(getProductCategoriesAsync());
   }, []);
 
   const { categories, error, loading } = useAppSelector(
@@ -39,8 +39,6 @@ const ProductCategory = () => {
 
   const priceHandleChange = (event: SelectChangeEvent) => {
     setPricePriceSort(event.target.value);
-
-    console.log(priceSort);
   };
 
   return (
@@ -59,7 +57,7 @@ const ProductCategory = () => {
           <CircularProgress />
         </Box>
       )} */}
-        {!error && !loading && (
+        {categories && (
           <Box
             sx={{
               display: "flex",

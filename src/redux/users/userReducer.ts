@@ -69,7 +69,7 @@ const userSlice = createSlice({
         state.singleUser = action.payload;
       })
       .addCase(getSingleUsersAsync.rejected, (state, action) => {
-        if (action.payload instanceof Error) {
+        if (action.payload instanceof AxiosError) {
           state.error = action.payload.message;
         }
       });

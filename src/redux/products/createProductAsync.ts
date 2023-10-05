@@ -4,24 +4,25 @@ import axios, { AxiosError } from "axios";
 import { CreateProduct } from "../../types/CreateProduct";
 import Product from "../../types/Product";
 
-export const createProductAsync = createAsyncThunk(
-  "products/createProduct",
-  async (product: CreateProduct, { rejectWithValue }) => {
-    try {
-      const response = await axios.post<Product>(
-        `https://api.escuelajs.co/api/v1/products/`,
-        product
-      );
-      // if (!response.data) {
-      //   throw new Error("Could not add product");
-      // }
-      //console.log(response.data);
-      return response.data;
-    } catch (e) {
-      const error = e as AxiosError;
-      // Use `err.response.data` as `action.payload` for a `rejected` action,
-      // by explicitly returning it using the `rejectWithValue()` utility
-      return rejectWithValue(error);
-    }
+export const createProductAsync = createAsyncThunk<
+  Product,
+  CreateProduct,
+  { rejectValue: AxiosError }
+>("products/createProduct", async (product, { rejectWithValue }) => {
+  try {
+    const response = await axios.post(
+      `https://api.escuelajs.co/api/v1/products/`,
+      product
+    );
+    // if (!response.data) {
+    //   throw new Error("Could not add product");
+    // }
+
+    return response.data;
+  } catch (e) {
+    const error = e as AxiosError;
+    // Use `err.response.data` as `action.payload` for a `rejected` action,
+    // by explicitly returning it using the `rejectWithValue()` utility
+    return rejectWithValue(error);
   }
-);
+});

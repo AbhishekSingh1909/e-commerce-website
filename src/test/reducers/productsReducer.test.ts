@@ -1,6 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import productReducer, {
-  getAllProducts,
+  getAllProductsAsync,
   sortByPrice,
   updateProductAsync,
 } from "../../redux/products/productReducer";
@@ -12,6 +12,8 @@ import { deleteProductAsync } from "../../redux/products/deleteProductAsync";
 import { CreateProduct } from "../../types/CreateProduct";
 import { createProductAsync } from "../../redux/products/createProductAsync";
 import UpdateProduct from "../../types/UpdateProduct";
+import { getProductsByCategoryAsync } from "../../redux/products/getProductsByCategoryAsync";
+import { getSingleProductByIdAsync } from "../../redux/products/getSingleProductByIdAsync";
 
 let store = createStore();
 
@@ -58,18 +60,30 @@ describe("Test actions in productReducer", () => {
 
 describe("Test Async Thunk actions in product reducer ", () => {
   test("get all products from Fake Store API", async () => {
-    await store.dispatch(getAllProducts());
+    await store.dispatch(getAllProductsAsync());
     const products = store.getState().productReducer.products;
-    expect(products.length > 0).toBe(true);
-    // expect(products.slice(0, 20).length).toBe(20);
+    expect(products.length).toBe(5);
+  });
+  test("get all products by category", async () => {
+    await store.dispatch(getProductsByCategoryAsync(2));
+    const products = store.getState().productReducer.products;
+    expect(products.length).toBe(3);
+  });
+  test("get a product by product Id", async () => {
+    await store.dispatch(getSingleProductByIdAsync(1));
+    const product = store.getState().productReducer.product;
+    expect(product?.title).toBe("Electronic Metal Keyboard");
   });
   test("delete an existing item", async () => {
     const resultAction = await store.dispatch(deleteProductAsync(1));
     expect(resultAction.payload).toBe(1);
   });
   test("delete an item which is not exist", async () => {
-    const resultAction = await store.dispatch(deleteProductAsync(10));
-    expect(resultAction.payload).toBe("Could not delete product");
+    await store.dispatch(deleteProductAsync(10));
+
+    expect(store.getState().productReducer.error).toBe(
+      "Could not delete product"
+    );
   });
   test("should create an Item", async () => {
     const product: CreateProduct = {

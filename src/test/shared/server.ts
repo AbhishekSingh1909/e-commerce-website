@@ -11,13 +11,32 @@ import UpdateProduct, { ProductDto } from "../../types/UpdateProduct";
 // and return the response 'John Smith' after 150ms
 // when receiving a get request to the `/api/user` endpoint
 export const handlers = [
-  //   rest.get("/api/user", (req, res, ctx) => {
-  //     return res(ctx.json("John Smith"), ctx.delay(150));
-  //   }),
+  rest.get("https://api.escuelajs.co/api/v1/products", (req, res, ctx) => {
+    return res(ctx.json(productsData));
+  }),
+  rest.get("https://api.escuelajs.co/api/v1/products/:id", (req, res, ctx) => {
+    const { id } = req.params;
+    const product = productsData.find((p) => p.id === Number(id));
+    if (product) {
+      return res(ctx.json(product));
+    }
+  }),
+  rest.get(
+    "https://api.escuelajs.co/api/v1/categories/:id/products",
+    (req, res, ctx) => {
+      const { id } = req.params;
+      const products = productsData.filter((p) => p.category.id === Number(id));
+      if (products) {
+        return res(ctx.json(products));
+      }
+    }
+  ),
+  rest.get("https://api.escuelajs.co/api/v1/categories", (req, res, ctx) => {
+    return res(ctx.json(categorydata));
+  }),
   rest.delete(
     "https://api.escuelajs.co/api/v1/products/:id",
     (req, res, ctx) => {
-      console.log("Catch API");
       const { id } = req.params;
       const index = productsData.find((p) => p.id === Number(id));
       if (index) {

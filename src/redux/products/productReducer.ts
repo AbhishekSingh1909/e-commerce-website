@@ -1,14 +1,16 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import { getProductsByCategory } from "./getProductsByCaregory";
+import { getProductsByCategoryAsync } from "./getProductsByCategoryAsync";
 import UpdateProduct from "../../types/UpdateProduct";
 import Product from "../../types/Product";
 import { createProductAsync } from "./createProductAsync";
 import { deleteProductAsync } from "./deleteProductAsync";
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { getSingleProductByIdAsync } from "./getSingleProductByIdAsync";
 
 const initialState: {
   products: Product[];
+  product?: Product;
   error?: string;
   loading: boolean;
 } = {
@@ -16,26 +18,31 @@ const initialState: {
   loading: false,
 };
 
-export const getAllProducts = createAsyncThunk(
-  "products/getAllProducts",
-  async () => {
-    try {
-      const response = await axios.get<any, AxiosResponse<Product[]>>(
-        `https://api.escuelajs.co/api/v1/products`
-      );
-      return response.data;
-    } catch (e) {
-      const error = e as AxiosError;
-      return error;
-    }
+export const getAllProductsAsync = createAsyncThunk<
+  Product[],
+  void,
+  { rejectValue: AxiosError }
+>("products/getAllProductsAsync", async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get(
+      `https://api.escuelajs.co/api/v1/products`
+    );
+    return response.data;
+  } catch (e) {
+    const error = e as AxiosError;
+    return rejectWithValue(error);
   }
-);
+});
 
-export const updateProductAsync = createAsyncThunk(
-  "products/updateProduct",
+export const updateProductAsync = createAsyncThunk<
+  Product,
+  UpdateProduct,
+  { rejectValue: AxiosError }
+>(
+  "products/updateProductAsync",
   async (params: UpdateProduct, { rejectWithValue }) => {
     try {
-      const response = await axios.put<Product>(
+      const response = await axios.put(
         `https://api.escuelajs.co/api/v1/products/${params.id}`,
         params.updateProduct
       );
@@ -63,50 +70,47 @@ const productsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getAllProducts.fulfilled, (state, action) => {
-      if (!(action.payload instanceof Error)) {
-        return {
-          ...state,
-          loading: false,
-          products: action.payload,
-        };
-      }
+    builder.addCase(getAllProductsAsync.fulfilled, (state, action) => {
+      state.products = action.payload;
+      state.loading = false;
+      state.error = undefined;
     });
 
-    builder.addCase(getAllProducts.pending, (state, action) => {
-      return {
-        ...state,
-        loading: true,
-      };
+    builder.addCase(getAllProductsAsync.pending, (state, action) => {
+      state.loading = true;
     });
 
-    builder.addCase(getAllProducts.rejected, (state, action) => {
-      if (action.payload instanceof Error)
-        return {
-          ...state,
-          error: action.payload.message,
-          loading: false,
-        };
-    });
+    builder
+      .addCase(getAllProductsAsync.rejected, (state, action) => {
+        if (action.payload instanceof Error)
+          state.error = action.payload.message;
+        state.loading = false;
+      })
+      .addCase(getSingleProductByIdAsync.fulfilled, (state, action) => {
+        state.product = action.payload;
+        state.error = undefined;
+        state.loading = false;
+      })
+      .addCase(getSingleProductByIdAsync.rejected, (state, action) => {
+        if (action.payload instanceof Error)
+          state.error = action.payload.message;
+      });
     builder
       .addCase(createProductAsync.fulfilled, (state, action) => {
-        // if (!(action.payload instanceof Error)) {
         const foundIndex = state.products.findIndex(
           (p) => p.id === action.payload.id
         );
-
+        console.log("createProductAsync.fulfilled");
+        console.log("state.products", state.products.length);
         if (foundIndex === -1) {
+          console.log("create foundIndex", foundIndex);
           state.products.push(action.payload);
         }
-        // }
+        console.log("state.products", state.products.length);
       })
       .addCase(createProductAsync.rejected, (state, action) => {
         if (action.payload instanceof AxiosError) {
-          return {
-            ...state,
-            error: action.payload.message,
-            loading: false,
-          };
+          state.error = action.payload.message;
         }
       });
     builder
@@ -121,11 +125,7 @@ const productsSlice = createSlice({
       })
       .addCase(updateProductAsync.rejected, (state, action) => {
         if (action.payload instanceof AxiosError) {
-          return {
-            ...state,
-            error: action.payload.message,
-            loading: false,
-          };
+          state.error = action.payload.message;
         }
       });
     builder
@@ -138,37 +138,21 @@ const productsSlice = createSlice({
       })
       .addCase(deleteProductAsync.rejected, (state, action) => {
         if (action.payload instanceof Error) {
-          return {
-            ...state,
-            error: action.payload.message,
-            loading: false,
-          };
+          state.error = action.payload.message;
         }
       });
 
     builder
-      .addCase(getProductsByCategory.fulfilled, (state, action) => {
-        if (!(action.payload instanceof Error)) {
-          return {
-            ...state,
-            loading: false,
-            products: action.payload,
-          };
+      .addCase(getProductsByCategoryAsync.fulfilled, (state, action) => {
+        state.products = action.payload;
+      })
+      .addCase(getProductsByCategoryAsync.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getProductsByCategoryAsync.rejected, (state, action) => {
+        if (action.payload instanceof Error) {
+          state.error = action.payload.message;
         }
-      })
-      .addCase(getProductsByCategory.pending, (state, action) => {
-        return {
-          ...state,
-          loading: true,
-        };
-      })
-      .addCase(getProductsByCategory.rejected, (state, action) => {
-        if (action.payload instanceof Error)
-          return {
-            ...state,
-            error: action.payload.message,
-            loading: false,
-          };
       });
   },
 });

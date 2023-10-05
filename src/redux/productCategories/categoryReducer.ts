@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import Category from "../../types/Category";
-import { getProductCategories } from "./getCaregories";
+import { getProductCategoriesAsync } from "./getProductCategoriesAsync";
+import { AxiosError } from "axios";
 
 const initialState: {
   categories: Category[];
@@ -18,28 +19,18 @@ const categorySlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getProductCategories.fulfilled, (state, action) => {
-        if (!(action.payload instanceof Error)) {
-          return {
-            ...state,
-            loading: false,
-            categories: action.payload,
-          };
-        }
+      .addCase(getProductCategoriesAsync.fulfilled, (state, action) => {
+        console.log("getProductCategoriesAsync.fulfilled");
+        state.categories = action.payload;
       })
-      .addCase(getProductCategories.pending, (state, action) => {
-        return {
-          ...state,
-          loading: true,
-        };
+      .addCase(getProductCategoriesAsync.pending, (state, action) => {
+        console.log("getProductCategoriesAsync.pending");
+        state.loading = true;
       })
-      .addCase(getProductCategories.rejected, (state, action) => {
-        if (action.payload instanceof Error) {
-          return {
-            ...state,
-            error: action.payload.message,
-            loading: false,
-          };
+      .addCase(getProductCategoriesAsync.rejected, (state, action) => {
+        console.log("getProductCategoriesAsync.rejected");
+        if (action.payload instanceof AxiosError) {
+          state.error = action.payload.message;
         }
       });
   },
