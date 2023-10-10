@@ -19,7 +19,16 @@ const initialState: {
 const userSlice = createSlice({
   name: "users",
   initialState,
-  reducers: {},
+  reducers: {
+    resetUser: (state) => {
+      return {
+        ...state,
+        error: undefined,
+        loading: false,
+        singleUser: undefined,
+      };
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createUsersAsync.fulfilled, (state, action) => {
@@ -30,11 +39,19 @@ const userSlice = createSlice({
 
         if (foundIndex === -1) {
           state.users.push(action.payload);
+          state.singleUser = action.payload;
+          state.loading = false;
         }
       })
       .addCase(createUsersAsync.rejected, (state, action) => {
         console.log("createUsersAsync.rejected");
         state.error = action.payload?.message;
+        state.loading = false;
+        state.singleUser = undefined;
+      })
+      .addCase(createUsersAsync.pending, (state, action) => {
+        state.error = undefined;
+        state.loading = true;
       });
     builder
       .addCase(updateUserAsync.fulfilled, (state, action) => {
@@ -77,4 +94,5 @@ const userSlice = createSlice({
 });
 
 const userReducer = userSlice.reducer;
+export const { resetUser } = userSlice.actions;
 export default userReducer;

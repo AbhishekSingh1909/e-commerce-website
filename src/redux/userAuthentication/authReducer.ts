@@ -4,9 +4,10 @@ import { JWTToken, User, UserAuth } from "../../types/User";
 import { userLogInAsync } from "./userLogInAsync";
 import { authenticateUserAsync } from "./authenticateUserAsync";
 
-type AuthType = {
+export type AuthType = {
   user?: User;
   error?: string;
+  loading?: boolean;
 };
 
 const initialState: AuthType = {
@@ -29,17 +30,28 @@ const authSlice = createSlice({
       .addCase(userLogInAsync.fulfilled, (state, action) => {
         console.log("fulfilled", action.payload);
         state.user = action.payload;
+        state.loading = false;
       })
       .addCase(userLogInAsync.rejected, (state, action) => {
-        console.log("rejected", action.payload);
         state.error = action.payload?.message;
+        state.loading = false;
+      })
+      .addCase(userLogInAsync.pending, (state, action) => {
+        state.loading = true;
+        state.error = undefined;
       });
     builder
       .addCase(authenticateUserAsync.fulfilled, (state, action) => {
         state.user = action.payload;
+        state.loading = false;
+      })
+      .addCase(authenticateUserAsync.pending, (state, action) => {
+        state.loading = true;
+        state.error = undefined;
       })
       .addCase(authenticateUserAsync.rejected, (state, action) => {
         state.error = action.payload?.message;
+        state.loading = false;
       });
   },
 });
