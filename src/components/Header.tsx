@@ -34,6 +34,10 @@ const Header = () => {
     setMenu(false);
     setAnchorEl(null);
   };
+
+  const handleProfile = () => {
+    navigate("profile", { replace: true });
+  };
   return (
     <AppBar position="static">
       <Toolbar
@@ -124,7 +128,7 @@ const Header = () => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <MenuItem onClick={handleProfile}>Profile</MenuItem>
                 <MenuItem onClick={handleLogOut}>LogOut</MenuItem>
               </Menu>
             )}

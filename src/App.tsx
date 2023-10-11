@@ -7,6 +7,7 @@ import Root from "./components/Root";
 import Home from "./components/Home";
 import Login from "./pages/Login";
 import UserRegister from "./components/user/UserRegistration";
+import { Profile } from "./pages/Profile";
 
 const App = () => {
   const route = createBrowserRouter([
@@ -21,6 +22,10 @@ const App = () => {
         {
           path: "products",
           element: <ProductCategory />,
+        },
+        {
+          path: "profile",
+          element: <Profile />,
         },
       ],
     },

@@ -59,14 +59,19 @@ const userSlice = createSlice({
           (user) => user.id === action.payload.id
         );
         console.log("update foundInex", foundIndex);
-        if (foundIndex !== -1) {
+        if (foundIndex > -1) {
           state.users[foundIndex] = action.payload;
+          state.singleUser = action.payload;
+          state.error = undefined;
+          console.log("update user state.singleUser", state.singleUser);
         }
       })
       .addCase(updateUserAsync.rejected, (state, action) => {
         console.log("updateUserAsync.rejected");
         if (action.payload instanceof AxiosError) {
           state.error = action.payload.message;
+          state.loading = false;
+          state.singleUser = undefined;
         }
       });
     builder
@@ -76,6 +81,7 @@ const userSlice = createSlice({
       .addCase(getAllUsersAsync.rejected, (state, action) => {
         if (action.payload instanceof Error) {
           state.error = action.payload.message;
+          state.error = undefined;
         }
       })
       .addCase(getAllUsersAsync.pending, (state, action) => {
@@ -84,11 +90,17 @@ const userSlice = createSlice({
     builder
       .addCase(getSingleUsersAsync.fulfilled, (state, action) => {
         state.singleUser = action.payload;
+        state.loading = false;
+        state.error = undefined;
       })
       .addCase(getSingleUsersAsync.rejected, (state, action) => {
         if (action.payload instanceof AxiosError) {
           state.error = action.payload.message;
         }
+      })
+      .addCase(getSingleUsersAsync.pending, (state, action) => {
+        state.loading = true;
+        state.error = undefined;
       });
   },
 });

@@ -67,6 +67,10 @@ const UserRegister = () => {
   };
 
   useEffect(() => {
+    console.log("clear");
+    dispatch(resetUser());
+  }, []);
+  useEffect(() => {
     if (error) {
       toast.error("Can't Register , because" + error, {
         position: toast.POSITION.TOP_RIGHT,
@@ -79,6 +83,7 @@ const UserRegister = () => {
       setTimeout(() => {
         userSignIn();
       }, 1000);
+
       dispatch(resetUser());
     }
   }, [error, singleUser]);
