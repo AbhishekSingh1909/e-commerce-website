@@ -1,6 +1,8 @@
 import {
+  Badge,
   Box,
   CircularProgress,
+  Container,
   FormControl,
   IconButton,
   InputLabel,
@@ -9,7 +11,11 @@ import {
   SelectChangeEvent,
   Stack,
   Typography,
+  InputBase,
+  Paper,
 } from "@mui/material";
+
+import SearchIcon from "@mui/icons-material/Search";
 import { getProductCategoriesAsync } from "../redux/productCategories/getProductCategoriesAsync";
 import { useEffect, useState } from "react";
 
@@ -20,7 +26,7 @@ import { CreateProductModel } from "../components/Model/CreateProductModel";
 
 const ProductCategory = () => {
   const dispatch = useAppDispatch();
-
+  const { user } = useAppSelector((state) => state.authReducer);
   const [categoryId, setCategoryId] = useState<number>(0);
   const [priceSort, setPricePriceSort] = useState("");
 
@@ -71,9 +77,11 @@ const ProductCategory = () => {
             {/* <FormControl fullWidth>
               
             </FormControl> */}
-            <Box sx={{ width: "60%" }}>
-              <CreateProductModel />
-            </Box>
+            {user?.role === "admin" && (
+              <Box sx={{ width: "60%" }}>
+                <CreateProductModel />
+              </Box>
+            )}
 
             <FormControl fullWidth>
               <InputLabel id="demo-select-price-sorting-standard-label">
@@ -87,7 +95,7 @@ const ProductCategory = () => {
                 onChange={priceHandleChange}
               >
                 <MenuItem value="">
-                  <em>None</em>
+                  <em>All</em>
                 </MenuItem>
                 <MenuItem value="asc">Low to High</MenuItem>
                 <MenuItem value="desc">High to Low</MenuItem>
@@ -106,7 +114,7 @@ const ProductCategory = () => {
                 onChange={filterHandleChange}
               >
                 <MenuItem value="">
-                  <em>None</em>
+                  <em>All</em>
                 </MenuItem>
                 {categories?.map((c) => (
                   <MenuItem value={c.id} key={c.id}>

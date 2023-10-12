@@ -20,9 +20,11 @@ const cartSlice = createSlice({
       );
 
       if (foundIndex !== -1) {
+        console.log("existing Product", cartItem);
         state.cartItems[foundIndex].quantity += 1;
       } else {
         state.cartItems.push(cartItem);
+        console.log("new Product", cartItem);
       }
     },
     detetFromCart: (state, action: PayloadAction<number>) => {

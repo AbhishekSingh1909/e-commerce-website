@@ -8,12 +8,17 @@ import Home from "./components/Home";
 import Login from "./pages/Login";
 import UserRegister from "./components/user/UserRegistration";
 import { Profile } from "./pages/Profile";
+import { AddtoCart } from "./pages/AddToCart";
+import { CustomError } from "./pages/Error";
+import path from "path";
+import { UsersList } from "./pages/UsersList";
 
 const App = () => {
   const route = createBrowserRouter([
     {
       path: "/",
       element: <Root />,
+      errorElement: <CustomError />,
       children: [
         {
           path: "",
@@ -26,6 +31,14 @@ const App = () => {
         {
           path: "profile",
           element: <Profile />,
+        },
+        {
+          path: "AddToCart",
+          element: <AddtoCart />,
+        },
+        {
+          path: "users",
+          element: <UsersList />,
         },
       ],
     },

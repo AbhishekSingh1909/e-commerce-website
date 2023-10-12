@@ -8,7 +8,13 @@ import {
   Pagination,
   Stack,
   Typography,
+  IconButton,
+  InputBase,
+  Paper,
+  TextField,
 } from "@mui/material";
+
+import SearchIcon from "@mui/icons-material/Search";
 
 import { useAppSelector } from "../app/hooks/useAppSelector";
 import { useEffect, useMemo, useState } from "react";
@@ -25,6 +31,9 @@ import BasicModal from "../components/Model/UpdateProductModel";
 import FormDialog from "../components/Model/UpdateProductModel";
 import UpdateProductModel from "../components/Model/UpdateProductModel";
 import { DeleteProductModel } from "../components/Model/DeleteProductModel";
+import { addToCart } from "../redux/cart/cartReducer";
+import Product from "../types/Product";
+import getFilteredProducts from "../selectors/getFilteredProducts";
 
 interface ProductProps {
   categoryId: number | undefined;
@@ -33,12 +42,12 @@ interface ProductProps {
 
 const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
   const [page, setPage] = useState(1);
-  const [pageLoading, setPageLoading] = useState(false);
   const [data, setData] = useState<IProduct[]>([]);
-  const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  // ProductsList({ limit: 20, offset: 0 });
+  const [search, setSearch] = useState("");
+  const [debounceSearch, setDebouncedSearch] = useState("");
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.authReducer);
 
   const { products, error, loading } = useAppSelector(
     (state) => state.productReducer
@@ -57,14 +66,27 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
     dispatch(sortByPrice(sortPrice === "asc" ? "asc" : "desc"));
   }, [sortPrice]);
 
+  useEffect(() => {
+    const timeOutId = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 100);
+
+    return () => clearTimeout(timeOutId);
+  }, [search]);
+
+  const filterProducts = useAppSelector((state) =>
+    getFilteredProducts(state, debounceSearch)
+  );
+
   const pageCount = useMemo(() => {
     setHasMore(products.length > 0);
-    const pageCount = Math.ceil(products.length / 10);
 
-    const data = products?.slice(0, 10);
+    const pageCount = Math.ceil(filterProducts.length / 10);
+
+    const data = filterProducts?.slice(0, 10);
     setData(data);
     return pageCount;
-  }, [products]);
+  }, [products, debounceSearch]);
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
@@ -74,13 +96,42 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
     // 11 - 20
     const startIndex = (value - 1) * 10;
 
-    const data = products?.slice(startIndex, value * 10);
+    const data = filterProducts?.slice(startIndex, value * 10);
     setData(data);
+  };
+
+  const handleAddToCart = (product: Product) => {
+    dispatch(addToCart(product));
+  };
+
+  const handleSeachChange = (search: string) => {
+    console.log("search Change");
+    setSearch(search);
   };
 
   return (
     <main>
       <Container>
+        <Container maxWidth="xs" sx={{ marginTop: "20px" }}>
+          <Paper
+            component="form"
+            sx={{
+              p: "2px 4px",
+              display: "flex",
+              alignItems: "center",
+              width: 400,
+            }}
+          >
+            <InputBase
+              sx={{ ml: 1, flex: 1 }}
+              placeholder="Search Prodcut by title"
+              onChange={(e) => handleSeachChange(e.target.value)}
+            />
+            <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
+              <SearchIcon />
+            </IconButton>
+          </Paper>
+        </Container>
         <Typography variant="h3">Products</Typography>;
         {error && <Typography> {`There is a error : ${error}`}</Typography>}
         {hasMore || (
@@ -140,22 +191,39 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
                   >
                     {p.price} €
                   </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Stack spacing={1}>
-                      <UpdateProductModel product={p} />
-                    </Stack>
-                    <Stack spacing={1}>
-                      <DeleteProductModel product={p} />
-                    </Stack>
-                  </Box>
+                  {user?.role === "admin" && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Stack spacing={1}>
+                        <UpdateProductModel product={p} />
+                      </Stack>
+                      <Stack spacing={1}>
+                        <DeleteProductModel product={p} />
+                      </Stack>
+                    </Box>
+                  )}
                 </CardContent>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <Button
+                    sx={{ marginLeft: "30%" }}
+                    onClick={(e) => handleAddToCart(p)}
+                  >
+                    Add To Cart
+                  </Button>
+                </Box>
               </Box>
             ))}
           </Box>

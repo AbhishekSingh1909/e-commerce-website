@@ -4,22 +4,61 @@ import Typography from "@mui/material/Typography";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+
 import { Link, useNavigate } from "react-router-dom";
-import { Box, IconButton, Menu, MenuItem, Stack, Toolbar } from "@mui/material";
+import {
+  Badge,
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  Stack,
+  Toolbar,
+} from "@mui/material";
 import { useAppDispatch } from "../app/hooks/useAppDispatch";
 import { useAppSelector } from "../app/hooks/useAppSelector";
 import { AuthType, logOut } from "../redux/userAuthentication/authReducer";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { StyledBadge } from "../custom-component/StyledCartButton";
+import { CartItem } from "../types/CartItem";
+import { clearCart } from "../redux/cart/cartReducer";
 
 const Header = () => {
-  const { user, error } = useAppSelector((state) => state.authReducer);
+  const { user } = useAppSelector((state) => state.authReducer);
+  const { cartItems } = useAppSelector((state) => state.cartReducer);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openMenu, setMenu] = useState(false);
+  const [items, setItems] = useState<CartItem[]>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  // const items = useMemo(() => {
+  //   if (user && cartItems?.length > 0) {
+  //     const userId = JSON.stringify(user.id);
+
+  //     const cartItems = localStorage.getItem(userId);
+  //     if (cartItems) {
+  //       return JSON.parse(cartItems);
+  //     }
+  //   }
+  // }, [user, cartItems]);
+
+  // useEffect(() => {
+  //   if (user && cartItems?.length > 0) {
+  //     const userId = JSON.stringify(user.id);
+
+  //     const cartItems = localStorage.getItem(userId);
+  //     if (cartItems) {
+  //       setItems(JSON.parse(cartItems));
+  //     }
+  //   }
+  // }, [user, cartItems]);
+  const calculateTotal = () =>
+    cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleLogOut = () => {
     dispatch(logOut());
+    dispatch(clearCart());
     setMenu(false);
     setAnchorEl(null);
     navigate("/", { replace: true });
@@ -72,8 +111,18 @@ const Header = () => {
             <Button component={Link} to="/products">
               Products
             </Button>
+            {user && user.role === "admin" && (
+              <Button component={Link} to="/users">
+                Users
+              </Button>
+            )}
           </NavButtonGroup>
         </Container>
+        <IconButton aria-label="cart" component={Link} to="AddToCart">
+          <StyledBadge badgeContent={calculateTotal()} color="secondary">
+            <ShoppingCartIcon color="warning" />
+          </StyledBadge>
+        </IconButton>
         {!user && (
           <Button
             component={Link}

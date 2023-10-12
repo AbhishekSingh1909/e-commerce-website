@@ -4,6 +4,8 @@ import { Outlet } from "react-router-dom";
 import { onlineStoreSiteTheme } from "../styles/theam";
 import Header from "./Header";
 import Footer from "./Footer";
+import { useAppSelector } from "../app/hooks/useAppSelector";
+import { useEffect } from "react";
 
 const Root = () => {
   return (

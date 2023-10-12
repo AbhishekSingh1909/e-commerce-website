@@ -77,6 +77,8 @@ const userSlice = createSlice({
     builder
       .addCase(getAllUsersAsync.fulfilled, (state, action) => {
         state.users = action.payload;
+        state.error = undefined;
+        state.loading = false;
       })
       .addCase(getAllUsersAsync.rejected, (state, action) => {
         if (action.payload instanceof Error) {
