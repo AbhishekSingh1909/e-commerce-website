@@ -19,7 +19,6 @@ import { purple } from "@mui/material/colors";
 import { Navigate, useNavigate } from "react-router-dom";
 
 import { useAppDispatch } from "../app/hooks/useAppDispatch";
-import { LoginCredential } from "../types/User";
 import { userLogInAsync } from "../redux/userAuthentication/userLogInAsync";
 import { useAppSelector } from "../app/hooks/useAppSelector";
 import Footer from "../components/Footer";
@@ -28,40 +27,16 @@ const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [showError, setShowError] = useState(false);
-  const [showMsg, setshowMsg] = useState(false);
   const { user, error, loading } = useAppSelector((state) => state.authReducer);
 
   useEffect(() => {
     if (error) {
-      console.log("error show", error);
       setShowError(true);
     }
-    // if (!error && user) {
-    //   setShowError(false);
-    // }
   }, [error]);
 
-  // useEffect(() => {
-  //   if (user) {
-  //     setshowMsg(true);
-  //   }
-  // });
-
-  // useEffect(() => {
-  //   console.log("erorro 1", error);
-  //   console.log("show error1", showError);
-  //   setShowError(false);
-  // }, []);
-
   const handleErroClose = () => {
-    console.log("show error handleCloseError", showError);
     setShowError(false);
-    //console.log("show error handleCloseError latest", showError);
-  };
-  const handleMsgClose = () => {
-    console.log("setshowMsg handleCloseError", showError);
-    setshowMsg(false);
-    //console.log("show error handleCloseError latest", showError);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -69,10 +44,6 @@ const Login = () => {
     const data = new FormData(event.currentTarget);
     const email = data.get("email") as string | null;
     const password = data.get("password") as string | null;
-    console.log("show error handleSubmit", showError);
-    // if (error) {
-    //   setShowError(true);
-    // }
 
     if (email && password) {
       dispatch(userLogInAsync({ email, password }));
@@ -80,7 +51,6 @@ const Login = () => {
   };
 
   const userSinUp = () => {
-    console.log("register go");
     navigate("/register", { replace: true });
   };
   return (
@@ -161,26 +131,14 @@ const Login = () => {
           </Box>
         </Box>
       </Container>
-      {/* {error && ( */}
       <Snackbar
         open={showError}
         autoHideDuration={5000}
         onClose={handleErroClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert severity="error">user credential is not valid ,{error}</Alert>
       </Snackbar>
-      {/* //)} */}
-      {/* {user && (
-        <Snackbar
-          open={showMsg}
-          autoHideDuration={5000}
-          onClose={handleMsgClose}
-        >
-          <Alert severity="success">
-            user credential is not valid ,{error}
-          </Alert>
-        </Snackbar>
-      )} */}
       <Footer />
     </Fragment>
   );

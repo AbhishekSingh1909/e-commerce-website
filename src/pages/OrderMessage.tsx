@@ -1,11 +1,12 @@
 import * as React from "react";
-import Grid from "@mui/material/Grid";
+
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Snackbar, { SnackbarOrigin } from "@mui/material/Snackbar";
 import { useAppSelector } from "../app/hooks/useAppSelector";
 import { useDispatch } from "react-redux";
 import { clearCart } from "../redux/cart/cartReducer";
+import { useNavigate } from "react-router-dom";
 
 interface State extends SnackbarOrigin {
   open: boolean;
@@ -13,29 +14,23 @@ interface State extends SnackbarOrigin {
 
 export const CheckOut = () => {
   const { user } = useAppSelector((state) => state.authReducer);
-  const [clear, setClear] = React.useState(false);
   const [state, setState] = React.useState<State>({
     open: false,
     vertical: "top",
     horizontal: "center",
   });
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { vertical, horizontal, open } = state;
 
   const handleClick = (newState: SnackbarOrigin) => () => {
-    setState({ ...newState, open: true });
-    setClear(true);
-    dispatch(clearCart());
+    if (!user) {
+      navigate("../login", { replace: true });
+    } else {
+      setState({ ...newState, open: true });
+      dispatch(clearCart());
+    }
   };
-  // React.useEffect(() => {
-  //   if (clear) {
-  //     if (user) {
-  //       console.log("clear cart");
-  //       localStorage.removeItem(JSON.stringify(user.id));
-  //     }
-  //   }
-  // }, [clear]);
-
   const handleClose = () => {
     setState({ ...state, open: false });
   };

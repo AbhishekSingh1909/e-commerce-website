@@ -1,8 +1,6 @@
 import {
-  Avatar,
   Box,
   Button,
-  Card,
   CardActions,
   CardMedia,
   Container,
@@ -13,6 +11,8 @@ import {
   Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { Link } from "react-router-dom";
+
 import { Wrapper } from "../custom-component/AddToCartPrimaryBox";
 import { useAppSelector } from "../app/hooks/useAppSelector";
 import { SecondryBox } from "../custom-component/SecondryBox";
@@ -24,26 +24,18 @@ import {
   increaseQuantity,
 } from "../redux/cart/cartReducer";
 import { CartItem } from "../types/CartItem";
-import { Fragment, useEffect } from "react";
+import { Fragment } from "react";
 import { CheckOut } from "./OrderMessage";
-import { Link } from "react-router-dom";
 
 export const AddtoCart = () => {
   const { cartItems } = useAppSelector((state) => state.cartReducer);
   const { user } = useAppSelector((state) => state.authReducer);
   const dispatch = useAppDispatch();
-  const addToCart = (id: number) => {
-    dispatch(increaseQuantity(id));
+
+  const addToCart = async (id: number) => {
+    await dispatch(increaseQuantity(id));
   };
 
-  useEffect(() => {
-    console.log("come here");
-    if (user) {
-      const userId = JSON.stringify(user.id);
-      const Items = JSON.stringify(cartItems);
-      localStorage.setItem(userId, Items);
-    }
-  }, [cartItems, user]);
   const removeFromCart = (id: number) => {
     dispatch(decreaseQunatity(id));
   };
@@ -176,16 +168,6 @@ export const AddtoCart = () => {
                     </Stack>
                   </CardActions>
                 </Box>
-                {/* <Avatar
-                  variant="square"
-                  src={item?.images[0]}
-                  alt={item?.title}
-                  sx={{
-                    maxWidth: "50%",
-                    objectFit: "cover",
-                    marginLeft: "40px",
-                  }}
-                ></Avatar> */}
               </SecondryBox>
             ))}
           </Box>
