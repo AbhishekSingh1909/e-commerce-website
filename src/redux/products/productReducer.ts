@@ -87,6 +87,7 @@ const productsSlice = createSlice({
         state.loading = false;
       })
       .addCase(getSingleProductByIdAsync.fulfilled, (state, action) => {
+        state.products = [action.payload];
         state.product = action.payload;
         state.error = undefined;
         state.loading = false;
@@ -94,6 +95,10 @@ const productsSlice = createSlice({
       .addCase(getSingleProductByIdAsync.rejected, (state, action) => {
         if (action.payload instanceof Error)
           state.error = action.payload.message;
+        state.loading = false;
+      })
+      .addCase(getSingleProductByIdAsync.pending, (state, action) => {
+        state.loading = true;
       });
     builder
       .addCase(createProductAsync.fulfilled, (state, action) => {

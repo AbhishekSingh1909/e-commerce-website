@@ -50,6 +50,7 @@ describe("Test user reducer async actions", () => {
       email: "nico.Jones@gmail.com",
       password: "ABCDE",
       avatar: "https://api.lorem.space/image/face?w=640&h=480&r=867",
+      role: "customer",
     };
     const updateUser: UpdateUser = {
       id: 1,
@@ -74,6 +75,7 @@ describe("Test user reducer async actions", () => {
       email: "nico.Jones@gmail.com",
       password: "ABCDE",
       avatar: "https://api.lorem.space/image/face?w=640&h=480&r=867",
+      role: "customer",
     };
     const updateUser: UpdateUser = {
       id: 83,

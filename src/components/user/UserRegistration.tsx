@@ -52,7 +52,7 @@ const UserRegister = () => {
     resolver: yupResolver(formSchema),
   });
 
-  const onFormSubmit: SubmitHandler<FormValues> = (data) => {
+  const onFormSubmit: SubmitHandler<FormValues> = async (data) => {
     const user: CreateNewUser = {
       name: data.name,
       email: data.email,
@@ -60,53 +60,42 @@ const UserRegister = () => {
       avatar:
         data.avatar ?? "https://api.lorem.space/image/face?w=640&h=480&r=867",
     };
-    dispatch(createUsersAsync(user));
+    const result = await dispatch(createUsersAsync(user));
+    if (result.meta.requestStatus === "fulfilled") {
+      toast.success(`Welcome ${user.name}`);
+      setTimeout(() => {
+        userSignIn();
+      }, 1000);
+    } else if (result.meta.requestStatus === "rejected") {
+      toast.error("Opps! User registration has failed");
+    }
   };
   const userSignIn = () => {
     navigate("../login", { replace: true });
   };
 
-  useEffect(() => {
-    console.log("clear");
-    dispatch(resetUser());
-  }, []);
-  useEffect(() => {
-    if (error) {
-      toast.error("Can't Register , because" + error, {
-        position: toast.POSITION.TOP_RIGHT,
-      });
-    }
-    if (singleUser) {
-      toast.success("Welcome " + singleUser.name, {
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      setTimeout(() => {
-        userSignIn();
-      }, 1000);
+  // useEffect(() => {
+  //   console.log("clear");
+  //   dispatch(resetUser());
+  // }, []);
+  // useEffect(() => {
+  //   if (error) {
+  //     toast.error("Can't Register , because" + error, {
+  //       position: toast.POSITION.TOP_RIGHT,
+  //     });
+  //   }
+  //   if (singleUser) {
+  //     toast.success("Welcome " + singleUser.name, {
+  //       position: toast.POSITION.TOP_RIGHT,
+  //     });
+  //     setTimeout(() => {
+  //       userSignIn();
+  //     }, 1000);
 
-      dispatch(resetUser());
-    }
-  }, [error, singleUser]);
-  const handleSubmit1 = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const fname = data.get("name") as string | null;
-    const femail = data.get("email") as string | null;
-    const fpassword = data.get("password") as string | null;
-    const fconfirm = data.get("confirm") as string | null;
-    const favatar = data.get("image") as string | null;
+  //     dispatch(resetUser());
+  //   }
+  // }, [error, singleUser]);
 
-    const user: CreateNewUser | null = {
-      name: fname ?? "",
-      email: femail ?? "",
-      password: fpassword ?? "",
-      avatar: favatar ?? "",
-    };
-
-    if (user) {
-      dispatch(createUsersAsync(user));
-    }
-  };
   return (
     <Fragment>
       <Container maxWidth="xs">
@@ -254,6 +243,7 @@ const UserRegister = () => {
             {errors.avatar && (
               <Typography color="red">{errors.avatar.message}</Typography>
             )}
+
             <ButtonBoxFlex>
               <Button
                 variant="contained"

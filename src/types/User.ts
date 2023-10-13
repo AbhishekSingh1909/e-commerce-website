@@ -21,3 +21,8 @@ export type UserAuth = {
   user: User | undefined;
   jwtToken: JWTToken | undefined;
 };
+
+export enum Role {
+  "admin",
+  "customer",
+}

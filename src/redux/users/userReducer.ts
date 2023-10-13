@@ -78,11 +78,13 @@ const userSlice = createSlice({
       .addCase(getAllUsersAsync.fulfilled, (state, action) => {
         state.users = action.payload;
         state.error = undefined;
+        state.singleUser = undefined;
         state.loading = false;
       })
       .addCase(getAllUsersAsync.rejected, (state, action) => {
         if (action.payload instanceof Error) {
           state.error = action.payload.message;
+          state.singleUser = undefined;
           state.error = undefined;
         }
       })
@@ -91,6 +93,7 @@ const userSlice = createSlice({
       });
     builder
       .addCase(getSingleUsersAsync.fulfilled, (state, action) => {
+        state.users = [action.payload];
         state.singleUser = action.payload;
         state.loading = false;
         state.error = undefined;

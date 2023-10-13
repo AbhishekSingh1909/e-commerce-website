@@ -12,6 +12,7 @@ import { AddtoCart } from "./pages/AddToCart";
 import { CustomError } from "./pages/Error";
 import path from "path";
 import { UsersList } from "./pages/UsersList";
+import FetchSingleProduct from "./pages/Product";
 
 const App = () => {
   const route = createBrowserRouter([
@@ -39,6 +40,11 @@ const App = () => {
         {
           path: "users",
           element: <UsersList />,
+        },
+
+        {
+          path: "product/:id",
+          element: <FetchSingleProduct />,
         },
       ],
     },

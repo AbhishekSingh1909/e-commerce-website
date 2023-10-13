@@ -8,4 +8,5 @@ export interface UpdateUserDto {
   email: string;
   password: string;
   avatar: string;
+  role: string;
 }

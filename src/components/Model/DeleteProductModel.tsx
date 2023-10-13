@@ -22,6 +22,7 @@ import { useAppDispatch } from "../../app/hooks/useAppDispatch";
 import { useAppSelector } from "../../app/hooks/useAppSelector";
 import Product from "../../types/Product";
 import { deleteProductAsync } from "../../redux/products/deleteProductAsync";
+import { ToastContainer, toast } from "react-toastify";
 
 export const DeleteProductModel = ({ product }: { product: Product }) => {
   const [open, setOpen] = React.useState(false);
@@ -44,23 +45,21 @@ export const DeleteProductModel = ({ product }: { product: Product }) => {
     setOpenAlert(false);
   };
 
-  const deletedProduct = () => {
+  const deletedProduct = async () => {
     if (product) {
-      dispatch(deleteProductAsync(product.id));
+      const result = await dispatch(deleteProductAsync(product.id));
+      if (result.meta.requestStatus === "fulfilled") {
+        toast.success(`${product.title} has been deleted successfully`);
+      } else if (result.meta.requestStatus === "rejected") {
+        toast.success(`${product.title} could not deleted`);
+      }
     }
   };
 
   return (
     <main>
       <Box>
-        {/* <Button
-          variant="outlined"
-          startIcon={<DeleteIcon />}
-          color="error"
-          onClick={handleClickOpen}
-        >
-          Delete
-        </Button> */}
+        <ToastContainer />
         <Tooltip title="Delete">
           <IconButton color="error" size="large" onClick={handleClickOpen}>
             <DeleteIcon />

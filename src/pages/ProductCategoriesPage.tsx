@@ -23,6 +23,7 @@ import { useAppDispatch } from "../app/hooks/useAppDispatch";
 import { useAppSelector } from "../app/hooks/useAppSelector";
 import ProductsPage from "./PorductsPage";
 import { CreateProductModel } from "../components/Model/CreateProductModel";
+import ErrorMessage from "../components/ErrorMessage";
 
 const ProductCategory = () => {
   const dispatch = useAppDispatch();
@@ -47,22 +48,28 @@ const ProductCategory = () => {
     setPricePriceSort(event.target.value);
   };
 
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: "100px",
+        }}
+      >
+        <CircularProgress size={64} color="secondary" />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return <ErrorMessage message={error} />;
+  }
+
   return (
     <main>
-      <Box
-      // sx={{
-      //   display: "flex",
-      //   alignItems: "end",
-      //   flexDirection: "row",
-      //   flexFlow: "wrap row",
-      // }}
-      >
-        {/* {error && <Typography> {`There is a error : ${error}`}</Typography>}
-      {loading && (
-        <Box>
-          <CircularProgress />
-        </Box>
-      )} */}
+      <Box>
         {categories && (
           <Box
             sx={{

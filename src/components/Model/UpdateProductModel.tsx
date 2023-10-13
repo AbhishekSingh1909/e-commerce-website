@@ -27,13 +27,12 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 
-import IProduct from "../../types/Product";
 import { useAppSelector } from "../../app/hooks/useAppSelector";
 import { useAppDispatch } from "../../app/hooks/useAppDispatch";
-
 import { updateProductAsync } from "../../redux/products/productReducer";
 import UpdateProduct, { ProductDto } from "../../types/UpdateProduct";
 import Product from "../../types/Product";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function UpdateProductModel({ product }: { product: Product }) {
   const [open, setOpen] = React.useState(false);
@@ -42,7 +41,7 @@ export default function UpdateProductModel({ product }: { product: Product }) {
   const [desc, setDesc] = React.useState(product.description);
   const [price, setPrice] = React.useState(product.price);
   const [categoryId, setCategoryId] = React.useState(product.category.id);
-  const [updatedProduct, setUpdatedProduct] = useState<UpdateProduct>();
+  // const [updatedProduct, setUpdatedProduct] = useState<UpdateProduct>();
   const [showMessage, setShowMessage] = useState(false);
   // const [singleProduct, setSingleProduct] = React.useState<Product>(product);
 
@@ -70,32 +69,34 @@ export default function UpdateProductModel({ product }: { product: Product }) {
     setCategoryId(+id);
   };
 
-  const saveChanges = () => {
+  const saveChanges = async () => {
     const productDto: ProductDto = {
       title: title,
       description: desc,
       price: price,
       categoryId: categoryId,
     };
-    const updateProduct: UpdateProduct = {
+    const updatedProduct: UpdateProduct = {
       id: product.id,
       updateProduct: productDto,
     };
-    setUpdatedProduct(updateProduct);
-    setShowMessage(true);
-    setOpenAlert(true);
-    // if (!showMessage) {
-    //   console.log("showMessage", showMessage);
-
-    // }
+    // setUpdatedProduct(product);
+    // setShowMessage(true);
+    // setOpenAlert(true);
+    const result = await dispatch(updateProductAsync(updatedProduct));
+    if (result.meta.requestStatus === "fulfilled") {
+      toast.success(`${product.title} has been updated successfully`);
+    } else if (result.meta.requestStatus === "rejected") {
+      toast.success(`${product.title} could not updated`);
+    }
   };
 
-  React.useEffect(() => {
-    if (updatedProduct) {
-      dispatch(updateProductAsync(updatedProduct));
-    }
-    setOpen(false);
-  }, [updatedProduct]);
+  // React.useEffect(() => {
+  //   if (updatedProduct) {
+  //     dispatch(updateProductAsync(updatedProduct));
+  //   }
+  //   setOpen(false);
+  // }, [updatedProduct]);
 
   // const  show  = React.useMemo(() => {
   //   if (updatedProduct ) {
@@ -108,9 +109,7 @@ export default function UpdateProductModel({ product }: { product: Product }) {
   return (
     <main>
       <Box>
-        {/* <Button variant="outlined" color="secondary" onClick={handleClickOpen}>
-          Update
-        </Button> */}
+        <ToastContainer />
         <Tooltip title="Edit">
           <IconButton color="secondary" onClick={handleClickOpen}>
             <ModeEditOutlineOutlinedIcon />

@@ -22,6 +22,7 @@ import { useAppDispatch } from "../../app/hooks/useAppDispatch";
 import { useAppSelector } from "../../app/hooks/useAppSelector";
 import { createProductAsync } from "../../redux/products/createProductAsync";
 import { CreateProduct } from "../../types/CreateProduct";
+import { ToastContainer, toast } from "react-toastify";
 
 export const CreateProductModel = () => {
   const [open, setOpen] = React.useState(false);
@@ -51,26 +52,36 @@ export const CreateProductModel = () => {
 
   const onCloseAlert = () => {
     setOpenAlert(false);
+    setShowMessage(false);
   };
 
-  const saveChanges = () => {
+  const saveChanges = async () => {
     const product: CreateProduct = {
       title: title,
       description: desc,
       price: price,
       categoryId: categoryId,
-      images: [image],
+      images: [image ?? "https://i.imgur.com/kTPCFG2.jpeg"],
     };
 
     setProduct(product);
+
+    setOpenAlert(true);
+    setOpen(false);
+    const result = await dispatch(createProductAsync(product));
+    if (result.meta.requestStatus === "fulfilled") {
+      toast.success(`${product.title} has been created successfully`);
+    } else if (result.meta.requestStatus === "rejected") {
+      toast.success(`${product.title} could not created`);
+    }
   };
 
-  useEffect(() => {
-    if (product) {
-      dispatch(createProductAsync(product));
-      setOpen(false);
-    }
-  }, [product]);
+  // useEffect(() => {
+  //   if (product) {
+  //     dispatch(createProductAsync(product));
+  //     setOpen(false);
+  //   }
+  // }, [product]);
 
   const categoryHandleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const id = event.target.value;
@@ -78,6 +89,7 @@ export const CreateProductModel = () => {
   };
   return (
     <main>
+      <ToastContainer />
       <Box sx={{ marginTop: "5px" }}>
         <Button
           variant="contained"

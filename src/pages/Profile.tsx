@@ -55,7 +55,7 @@ export const Profile = () => {
       <Card sx={{ maxWidth: 345, margin: "20px" }}>
         <CardMedia
           component="img"
-          alt={user?.name}
+          alt={currentUser?.name}
           height="194"
           image={currentUser?.avatar}
         />
@@ -86,7 +86,11 @@ export const Profile = () => {
         </CardContent>
         <CardActions>
           <Stack direction="row" spacing={2}>
-            <Button variant="outlined" startIcon={<DeleteIcon />}>
+            <Button
+              variant="contained"
+              startIcon={<DeleteIcon color="error" />}
+              size="large"
+            >
               Delete
             </Button>
             {currentUser && <UpdateProfileModel updateUser={currentUser} />}

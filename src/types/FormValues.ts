@@ -8,7 +8,6 @@ export interface FormValues {
   avatar?: string | undefined | null;
 }
 
-const passwordRules = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,20}$/;
 export const formSchema = yup.object({
   name: yup.string().max(30).required("Required"),
   email: yup
@@ -18,8 +17,9 @@ export const formSchema = yup.object({
     .required("Required"),
   password: yup
     .string()
-    .matches(passwordRules, { message: "Please create a stronger password" })
-    .required("Required"),
+    .min(5)
+    .max(20)
+    .required("Please create a stronger password"),
   confirm: yup
     .string()
     .oneOf([yup.ref("password")], "Passwords must match")

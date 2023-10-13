@@ -26,14 +26,14 @@ import {
 } from "../redux/products/productReducer";
 import { getProductCategoriesAsync } from "../redux/productCategories/getProductCategoriesAsync";
 import { getProductsByCategoryAsync } from "../redux/products/getProductsByCategoryAsync";
-import IPaginationQuery from "../types/Queries/PaginationQuery";
-import BasicModal from "../components/Model/UpdateProductModel";
-import FormDialog from "../components/Model/UpdateProductModel";
-import UpdateProductModel from "../components/Model/UpdateProductModel";
-import { DeleteProductModel } from "../components/Model/DeleteProductModel";
+
 import { addToCart } from "../redux/cart/cartReducer";
 import Product from "../types/Product";
 import getFilteredProducts from "../selectors/getFilteredProducts";
+import { Link } from "react-router-dom";
+import UpdateProductModel from "../components/Model/UpdateProductModel";
+import { DeleteProductModel } from "../components/Model/DeleteProductModel";
+import ErrorMessage from "../components/ErrorMessage";
 
 interface ProductProps {
   categoryId: number | undefined;
@@ -42,7 +42,7 @@ interface ProductProps {
 
 const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
   const [page, setPage] = useState(1);
-  const [data, setData] = useState<IProduct[]>([]);
+  const [data, setData] = useState<Product[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [search, setSearch] = useState("");
   const [debounceSearch, setDebouncedSearch] = useState("");
@@ -52,7 +52,6 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
   const { products, error, loading } = useAppSelector(
     (state) => state.productReducer
   );
-  // console.log("categoryId", categoryId);
   useEffect(() => {
     if (categoryId) {
       console.log("categoryId", categoryId);
@@ -109,6 +108,25 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
     setSearch(search);
   };
 
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: "100px",
+        }}
+      >
+        <CircularProgress size={64} color="secondary" />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return <ErrorMessage message={error} />;
+  }
+
   return (
     <main>
       <Container>
@@ -133,12 +151,6 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
           </Paper>
         </Container>
         <Typography variant="h3">Products</Typography>;
-        {error && <Typography> {`There is a error : ${error}`}</Typography>}
-        {hasMore || (
-          <Box>
-            <CircularProgress />
-          </Box>
-        )}
         {data && (
           <Box
             sx={{
@@ -213,15 +225,15 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
                   sx={{
                     display: "flex",
                     flexDirection: "row",
-                    alignItems: "center",
+                    justifyContent: "space-around",
                     width: "100%",
                   }}
                 >
-                  <Button
-                    sx={{ marginLeft: "30%" }}
-                    onClick={(e) => handleAddToCart(p)}
-                  >
+                  <Button onClick={(e) => handleAddToCart(p)}>
                     Add To Cart
+                  </Button>
+                  <Button component={Link} to={`/product/${p.id}`}>
+                    More Details
                   </Button>
                 </Box>
               </Box>

@@ -22,15 +22,18 @@ const categorySlice = createSlice({
       .addCase(getProductCategoriesAsync.fulfilled, (state, action) => {
         console.log("getProductCategoriesAsync.fulfilled");
         state.categories = action.payload;
+        state.loading = false;
       })
       .addCase(getProductCategoriesAsync.pending, (state, action) => {
         console.log("getProductCategoriesAsync.pending");
         state.loading = true;
+        state.error = undefined;
       })
       .addCase(getProductCategoriesAsync.rejected, (state, action) => {
         console.log("getProductCategoriesAsync.rejected");
         if (action.payload instanceof AxiosError) {
           state.error = action.payload.message;
+          state.loading = false;
         }
       });
   },
