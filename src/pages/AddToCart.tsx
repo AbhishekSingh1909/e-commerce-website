@@ -22,7 +22,7 @@ import {
   decreaseQunatity,
   detetFromCart,
   increaseQuantity,
-} from "../redux/cart/cartReducer";
+} from "../redux/reducers/cart/cartReducer";
 import { CartItem } from "../types/CartItem";
 import { Fragment } from "react";
 import { CheckOut } from "./OrderMessage";
@@ -88,7 +88,7 @@ export const AddtoCart = () => {
           <Box sx={{ marginTop: "10px", padding: "10px" }}>
             {cartItems.map((item) => (
               <SecondryBox>
-                <Box sx={{ flex: "1" }}>
+                <Box sx={{ flex: "1" }} key={item?.id}>
                   {item?.title && (
                     <Typography variant="h6"> {item?.title}</Typography>
                   )}

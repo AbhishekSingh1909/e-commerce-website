@@ -1,8 +1,5 @@
-import React from "react";
-import ProductsPage from "./pages/PorductsList";
-import ProductCategory from "./pages/ProductFilter";
-
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+
 import Root from "./components/Root";
 import Home from "./components/Home";
 import Login from "./pages/Login";
@@ -10,9 +7,11 @@ import UserRegister from "./components/user/UserRegistration";
 import { Profile } from "./pages/Profile";
 import { AddtoCart } from "./pages/AddToCart";
 import { CustomError } from "./pages/Error";
-import path from "path";
 import { UsersList } from "./pages/UsersList";
 import FetchSingleProduct from "./pages/Product";
+import ProductCategory from "./pages/ProductFilter";
+import { AdminDashboard } from "./components/AdminDashBoard";
+import ProductTableList from "./pages/ProductsTableList";
 
 const App = () => {
   const route = createBrowserRouter([
@@ -37,9 +36,20 @@ const App = () => {
           path: "AddToCart",
           element: <AddtoCart />,
         },
+
         {
-          path: "users",
-          element: <UsersList />,
+          path: "dashbord",
+          element: <AdminDashboard />,
+          children: [
+            {
+              path: "",
+              element: <ProductTableList />,
+            },
+            {
+              path: "users",
+              element: <UsersList />,
+            },
+          ],
         },
 
         {

@@ -11,6 +11,9 @@ import {
   IconButton,
   InputBase,
   Paper,
+  Card,
+  CardMedia,
+  CardActions,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { Link } from "react-router-dom";
@@ -21,12 +24,11 @@ import { useAppDispatch } from "../app/hooks/useAppDispatch";
 import {
   getAllProductsAsync,
   sortByPrice,
-} from "../redux/products/productReducer";
-import { getProductsByCategoryAsync } from "../redux/products/getProductsByCategoryAsync";
-import { addToCart } from "../redux/cart/cartReducer";
+} from "../redux/reducers/product/productReducer";
+import { getProductsByCategoryAsync } from "../redux/reducers/product/getProductsByCategoryAsync";
+import { addToCart } from "../redux/reducers/cart/cartReducer";
 import Product from "../types/Product";
 import getFilteredProducts from "../selectors/getFilteredProducts";
-
 import UpdateProductModel from "../components/Model/UpdateProductModel";
 import { DeleteProductModel } from "../components/Model/DeleteProductModel";
 import ErrorMessage from "../components/ErrorMessage";
@@ -49,7 +51,6 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
   );
   useEffect(() => {
     if (categoryId) {
-      console.log("categoryId", categoryId);
       dispatch(getProductsByCategoryAsync(categoryId));
     } else {
       dispatch(getAllProductsAsync());
@@ -68,15 +69,12 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
     return () => clearTimeout(timeOutId);
   }, [search]);
 
-  const filterProducts = useAppSelector((state) =>
-    getFilteredProducts(state, debounceSearch)
-  );
-
-  const pageCount = useMemo(() => {
+  const { pageCount, filterProducts } = useMemo(() => {
+    const filterProducts = getFilteredProducts(products, debounceSearch);
     const pageCount = Math.ceil(filterProducts.length / 10);
     const data = filterProducts?.slice(0, 10);
     setData(data);
-    return pageCount;
+    return { pageCount, filterProducts };
   }, [products, debounceSearch]);
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -153,68 +151,42 @@ const ProductsPage = ({ categoryId, sortPrice }: ProductProps) => {
             }}
           >
             {data?.map((p) => (
-              <Box
-                key={p.id + "" + p.title}
-                sx={{
-                  width: "30%",
-                  hight: "10%",
-                  padding: "1em",
-                  alignItems: "center",
-                }}
-              >
-                <CardContent
-                  sx={{
-                    backgroundColor: "grey",
-                    color: "rgb(255, 236, 179)",
-                    borderRadius: "5px",
-                  }}
-                >
-                  <Typography>{p.title}</Typography>
-                  <Box>
-                    <Avatar
-                      alt="Remy Sharp"
-                      src={p.images[0]}
-                      variant="square"
-                      sx={{ display: "block", width: "100%", height: "5%" }}
-                    />
-                  </Box>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {p.price} €
-                  </Typography>
-                  {user?.role === "admin" && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Stack spacing={1}>
-                        <UpdateProductModel product={p} />
-                      </Stack>
-                      <Stack spacing={1}>
-                        <DeleteProductModel product={p} />
-                      </Stack>
-                    </Box>
+              <Card sx={{ Width: "80%", margin: "20px" }} key={p.id}>
+                <CardMedia
+                  component="img"
+                  alt={p?.title}
+                  height="194"
+                  image={p?.images[0]}
+                />
+                <CardContent>
+                  {p && (
+                    <Typography gutterBottom variant="h6" component="div">
+                      Title : {p.title}
+                    </Typography>
+                  )}
+                  {p && (
+                    <Typography color="text.secondary">
+                      Category : {p.category.name}
+                    </Typography>
+                  )}
+
+                  {p && (
+                    <Typography color="text.secondary">
+                      Price : {p.price}€
+                    </Typography>
                   )}
                 </CardContent>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-around",
-                    width: "100%",
-                  }}
-                >
-                  <Button onClick={(e) => handleAddToCart(p)}>
-                    Add To Cart
-                  </Button>
-                  <Button component={Link} to={`/product/${p.id}`}>
-                    More Details
-                  </Button>
-                </Box>
-              </Box>
+                <CardActions>
+                  <Stack direction="row" spacing={2}>
+                    <Button onClick={(e) => handleAddToCart(p)}>
+                      Add To Cart
+                    </Button>
+                    <Button component={Link} to={`/product/${p.id}`}>
+                      View
+                    </Button>
+                  </Stack>
+                </CardActions>
+              </Card>
             ))}
           </Box>
         )}

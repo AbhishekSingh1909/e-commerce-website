@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 
-import { getProductCategoriesAsync } from "../redux/productCategories/getProductCategoriesAsync";
+import { getProductCategoriesAsync } from "../redux/reducers/category/getProductCategoriesAsync";
 
 import { useAppDispatch } from "../app/hooks/useAppDispatch";
 import { useAppSelector } from "../app/hooks/useAppSelector";
@@ -72,12 +72,6 @@ const ProductCategory = () => {
               marginTop: "2em",
             }}
           >
-            {user?.role === "admin" && (
-              <Box sx={{ width: "60%" }}>
-                <CreateProductModel />
-              </Box>
-            )}
-
             <FormControl fullWidth>
               <InputLabel id="demo-select-price-sorting-standard-label">
                 By Price
