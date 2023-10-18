@@ -83,4 +83,4 @@ first clone the project from the repository and run the node commands.
 
 ## Deployment
 
-- this project can access by url -https://tiny-lily-dcaacd.netlify.app
+- this project can access by url -https://abhishek-estore.netlify.app
