@@ -79,7 +79,7 @@ first clone the project from the repository and run the node commands.
 
 ### Folder structure
 
-- Horizontal Function bases project
+- Horizontal Function based folder structure
 
 ## Deployment
 
