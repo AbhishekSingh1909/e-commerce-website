@@ -166,5 +166,6 @@ To run test: npm test
 
 ## Deployment
 
-- this project can access by url -https://tiny-lily-dcaacd.netlify.app
+- this app can access by the url
+(https://abhishek-react-brewery.netlify.app/)
 ```
