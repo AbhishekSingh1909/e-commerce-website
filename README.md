@@ -167,5 +167,5 @@ To run test: npm test
 ## Deployment
 
 - this app can access by the url
-(https://abhishek-react-brewery.netlify.app/)
+[(https://abhishek-estore.netlify.app/)](https://abhishek-estore.netlify.app/)
 ```
