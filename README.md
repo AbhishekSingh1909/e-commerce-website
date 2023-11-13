@@ -168,5 +168,6 @@ To run test: npm test
 
 - this app can access by the url
 [(https://abhishek-estore.netlify.app/)](https://abhishek-estore.netlify.app/)
+[(https://singh-project.netlify.app/)] (https://singh-project.netlify.app/)
 [(https://e-commerce-website-rho-eight.vercel.app/)] (https://e-commerce-website-rho-eight.vercel.app/)
 ```
